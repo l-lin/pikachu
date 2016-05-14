@@ -1,21 +1,21 @@
 package web
 
 import (
-	"net/http"
-	"log"
 	"encoding/json"
-	"github.com/l-lin/pikachu/service"
 	"fmt"
 	"github.com/gorilla/mux"
-	"io/ioutil"
+	"github.com/l-lin/pikachu/entity"
 	"io"
+	"io/ioutil"
+	"log"
+	"net/http"
 	"strconv"
 )
 
 // Handler to fetch the services
 func GetServices(w http.ResponseWriter, r *http.Request) {
 	log.Printf("[-] Fetching services")
-	write(w, http.StatusOK, service.GetServices())
+	write(w, http.StatusOK, entity.GetServices())
 }
 
 // Handler to fetch a service
@@ -24,7 +24,7 @@ func GetService(w http.ResponseWriter, r *http.Request) {
 	serviceId, _ := strconv.Atoi(vars["serviceId"])
 	log.Printf("[-] Fetching service %d", serviceId)
 
-	s := service.GetService(serviceId)
+	s := entity.GetService(serviceId)
 	if s != nil {
 		write(w, http.StatusOK, s)
 		return
@@ -36,7 +36,7 @@ func GetService(w http.ResponseWriter, r *http.Request) {
 
 // Handler to save a service
 func SaveService(w http.ResponseWriter, r *http.Request) {
-	var s service.Service
+	var s entity.Service
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
 		log.Printf("[x] Could not read the body. Reason: %s", err.Error())
@@ -60,18 +60,18 @@ func SaveService(w http.ResponseWriter, r *http.Request) {
 }
 
 // Handler to update a service
-func UpdateService(w http.ResponseWriter, r *http.Request)  {
+func UpdateService(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	serviceId, _ := strconv.Atoi(vars["serviceId"])
 
-	oldService := service.GetService(serviceId)
+	oldService := entity.GetService(serviceId)
 	if oldService == nil {
 		log.Printf("[-] Could not find the service %d", serviceId)
 		write(w, http.StatusNotFound, JsonErr{Code: http.StatusNotFound, Text: fmt.Sprintf("Service not found for serviceId %d", serviceId)})
 		return
 	}
 
-	var s service.Service
+	var s entity.Service
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
 		log.Fatalf("[x] Could not read the body. Reason: %s", err.Error())
@@ -92,10 +92,10 @@ func UpdateService(w http.ResponseWriter, r *http.Request)  {
 }
 
 // Handler to delete a service
-func DeleteService(w http.ResponseWriter, r *http.Request)  {
+func DeleteService(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	serviceId, _ := strconv.Atoi(vars["serviceId"])
-	s := service.NewService()
+	s := entity.NewService()
 	s.ServiceId = serviceId
 
 	log.Printf("[-] Deleting service id %d", serviceId)
@@ -108,7 +108,7 @@ func GetInstances(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	serviceId, _ := strconv.Atoi(vars["serviceId"])
 
-	instances := service.GetInstances(serviceId)
+	instances := entity.GetInstances(serviceId)
 	if instances != nil && len(instances) > 0 {
 		log.Printf("[-] Found %d instances of serviceId %d", len(instances), serviceId)
 		write(w, http.StatusOK, instances)
@@ -121,11 +121,11 @@ func GetInstances(w http.ResponseWriter, r *http.Request) {
 }
 
 // Handler to save an instance
-func SaveInstance(w http.ResponseWriter, r *http.Request)  {
+func SaveInstance(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	serviceId, _ := strconv.Atoi(vars["serviceId"])
 
-	var i service.Instance
+	var i entity.Instance
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
 		log.Printf("[x] Could not read the body. Reason: %s", err.Error())
@@ -154,7 +154,7 @@ func GetInstance(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	instanceId, _ := strconv.Atoi(vars["instanceId"])
 
-	instance := service.GetInstance(instanceId)
+	instance := entity.GetInstance(instanceId)
 	if instance != nil {
 		log.Printf("[-] Found instances %d", instanceId)
 		write(w, http.StatusOK, instance)
@@ -167,18 +167,18 @@ func GetInstance(w http.ResponseWriter, r *http.Request) {
 }
 
 // Handler to update an instance
-func UpdateInstance(w http.ResponseWriter, r *http.Request)  {
+func UpdateInstance(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	instanceId, _ := strconv.Atoi(vars["instanceId"])
 
-	oldInstance := service.GetInstance(instanceId)
+	oldInstance := entity.GetInstance(instanceId)
 	if oldInstance == nil {
 		log.Printf("[-] Could not find the instances for instanceId %d", instanceId)
 		write(w, http.StatusNotFound, JsonErr{Code: http.StatusNotFound, Text: fmt.Sprintf("Instance not found for instanceId %d", instanceId)})
 		return
 	}
 
-	var i service.Instance
+	var i entity.Instance
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
 		log.Fatalf("[x] Could not read the body. Reason: %s", err.Error())
@@ -199,10 +199,10 @@ func UpdateInstance(w http.ResponseWriter, r *http.Request)  {
 }
 
 // Handler to delete an instance
-func DeleteInstance(w http.ResponseWriter, r *http.Request)  {
+func DeleteInstance(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	instanceId, _ := strconv.Atoi(vars["instanceId"])
-	i := service.NewInstance()
+	i := entity.NewInstance()
 	i.InstanceId = instanceId
 
 	log.Printf("[-] Deleting instance id %d", instanceId)

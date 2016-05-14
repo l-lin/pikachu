@@ -28,3 +28,13 @@ gin-bin*
 *.iml
 .idea
 local.sh
+node_modules/
+build/
+app/*.js
+app/*.js.map
+
+public/styles
+public/index.html
+public/systemjs.config.js
+public/app/*.js
+public/app/*.js.map
